@@ -1,0 +1,87 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #05014a;
+  }
+
+  .log-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start; /* Aligns boxes to the start of the container */
+    /* ... other styles ... */
+}
+
+.log-box {
+    flex: 1 0 calc(20% - 10px); /* Makes each box take up 20% of the container width, adjusting for the gap */
+    max-width: calc(20% - 10px); /* Sets a maximum width to accommodate the gap */
+    box-sizing: border-box; /* Includes padding and border in the width calculation */
+    /* ... other styles ... */
+}
+
+/* You may need media queries to handle smaller screen sizes. */
+@media (max-width: 1200px) {
+    .log-box {
+        flex: 1 0 calc(25% - 10px); /* 4 boxes per row */
+        max-width: calc(25% - 10px);
+    }
+}
+
+@media (max-width: 992px) {
+    .log-box {
+        flex: 1 0 calc(33.333% - 10px); /* 3 boxes per row */
+        max-width: calc(33.333% - 10px);
+    }
+}
+
+@media (max-width: 768px) {
+    .log-box {
+        flex: 1 0 calc(50% - 10px); /* 2 boxes per row */
+        max-width: calc(50% - 10px);
+    }
+}
+
+@media (max-width: 576px) {
+    .log-box {
+        flex: 1 0 100%; /* 1 box per row */
+        max-width: 100%;
+    }
+}
+
+
+  .graph-container {
+    width: 100%;
+    height: 400px; /* Adjust height as needed */
+    margin-top: 20px;
+  }
+  
+  .log-title {
+    flex-grow: 1; /* Allow the title to grow and take up available space */
+    display: flex; /* Use flexbox inside the title to align icon and text */
+    align-items: center; /* Vertically center items in the title */
+    gap: 5px; /* Add gap between icon and text */
+    /* Rest of your styles... */
+}
+
+.log-entries {
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: 5px;
+}
+
+.log-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#statusMessage {
+  text-align: center; /* Centers text within the element */
+  width: 100%; /* Ensures the element spans the full width of the viewport */
+  position: fixed; /* Fixed positioning relative to the viewport */
+  left: 0; /* Aligns the left edge of the element with the left edge of the viewport */
+  bottom: 0; /* Positions the element at the bottom of the viewport */
+  padding: 10px 0; /* Adds some padding above and below the text */
+  background-color: rgba(255,255,255,0.9); /* Optional: adds a slight background for readability */
+  z-index: 1000; /* Ensures the status message is above other content */
+  pointer-events: none;
+}
