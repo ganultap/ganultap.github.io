@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const resumeBtn = document.getElementById('resume');
     const pauseBtn = document.getElementById('pause');
     const clearBtn = document.getElementById('clear');
-    const saveBtn = document.getElementById('save');
     const hostnameInput = document.getElementById('hostnameIp');
     const logsContainer = document.getElementById('logs');
     const pingChartCanvas = document.getElementById('pingChart');
@@ -177,26 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         updateStatusMessage(); // Reflect the status change
     });
-    
 
-    saveBtn.addEventListener('click', function () {
-        let logText = '';
-        Object.entries(pingingHosts).forEach(([hostname, hostInfo]) => {
-            logText += `Ping results for ${hostname}:\n`;
-            const logEntries = hostInfo.logBox.querySelectorAll('.log-entry'); // Ensure .log-entry class exists in your log entries
-            logEntries.forEach(entry => {
-                logText += entry.textContent + '\n';
-            });
-            logText += '\n';
-        });
-
-        const blob = new Blob([logText], { type: 'text/plain' });
-        const anchor = document.createElement('a');
-        anchor.href = URL.createObjectURL(blob);
-        anchor.download = 'ping_logs.txt';
-        anchor.click();
-        URL.revokeObjectURL(anchor.href);
-    });
 
     function getRandomColor() {
         const r = Math.floor(Math.random() * 256); // Random between 0-255
@@ -427,19 +407,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    
-    
-    function autoSaveLogs(logData) {
-        fetch('saveLogs.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(logData)
-        })
-        .then(response => response.json())
-        .then(data => console.log(data.message))
-        .catch(error => console.error('Error saving logs:', error));
-    }
-    
+
     
     function parsePingTime(pingOutput) {
         // Check for "Request timed out" message
@@ -470,20 +438,66 @@ document.getElementById('downloadPdf').addEventListener('click', function () {
         // Get the canvas data as an image
         const imageData = canvas.toDataURL('image/png');
 
-        // Determine the PDF page width and height based on canvas size and desired orientation
-        const pdfWidth = canvas.height;
-        const pdfHeight = canvas.width;
+        // Determine the current date and time
+        const currentDateTime = moment().format('YYYY-MM-DD-HH-mm');
 
         // Initialize jsPDF in landscape orientation ('l'), and match the size to the canvas
         const pdf = new jspdf.jsPDF({
             orientation: 'l', // 'l' for landscape
             unit: 'px',
-            format: [pdfWidth, pdfHeight]
+            format: [canvas.height, canvas.width] // Use canvas dimensions for PDF size
         });
 
         // Add the canvas image to the PDF. The image can be scaled to fit the page.
-        pdf.addImage(imageData, 'PNG', 0, 0, pdfHeight, pdfWidth); // Note the swapped width and height for landscape
-        pdf.save('webpage-landscape.pdf');
+        pdf.addImage(imageData, 'PNG', 0, 0, canvas.width, canvas.height);
+
+        // Save the PDF with the specified file name
+        pdf.save(`ping_result_for_${currentDateTime}.pdf`);
     });
 });
 
+document.getElementById('downloadGraph').addEventListener('click', function () {
+    // Get the graph canvas
+    const graphCanvas = document.getElementById('pingChart');
+
+    // Create a clone of the canvas with Chart.js
+    const cloneCanvas = document.createElement('canvas');
+    cloneCanvas.width = graphCanvas.width;
+    cloneCanvas.height = graphCanvas.height;
+    const cloneCtx = cloneCanvas.getContext('2d');
+
+    // Render the chart onto the clone canvas
+    new Chart(cloneCtx, {
+        type: 'line',
+        data: pingChart.config.data,
+        options: pingChart.config.options
+    });
+
+    // Add the clone canvas to the document body
+    document.body.appendChild(cloneCanvas);
+
+    // Create a screenshot of the entire graph area including the tooltips
+    html2canvas(cloneCanvas, {
+        scrollX: 0,
+        scrollY: 0,
+        width: cloneCanvas.width,
+        height: cloneCanvas.height,
+        allowTaint: true,
+        useCORS: true,
+        backgroundColor: null // Set to 'null' to ensure transparency
+    }).then(canvas => {
+        // Get the canvas data as an image
+        const imageData = canvas.toDataURL('image/png');
+
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = imageData;
+        link.download = 'graph_with_details.png'; // Set the file name
+
+        // Simulate a click on the link to trigger the download
+        link.click();
+
+        // Remove the clone canvas from the document body
+        document.body.removeChild(cloneCanvas);
+    });
+});

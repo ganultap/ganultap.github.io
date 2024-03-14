@@ -24,8 +24,9 @@
                         <button type="button" class="btn btn-success" id="resume">Resume</button>
                         <button type="button" class="btn btn-warning" id="pause">Pause</button>
                         <button type="button" class="btn btn-danger" id="clear">Clear</button>
-                        <button type="button" class="btn btn-secondary" id="save">Save Logs</button>
                         <button class="btn btn-info" id="downloadPdf">Export as PDF</button>
+                        <button class="btn btn-secondary" id="downloadGraph">Export Graph</button>
+
                     </form>
                     <canvas id="pingChart" style="width: 100%; height: 400px;"></canvas>
                     <div id="logs" class="log-container"></div>
@@ -33,15 +34,40 @@
             </div>
         </div>
     </header>
-    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.21.3/dist/date-fns.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-adapter-moment/1.0.0/chartjs-adapter-moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js"></script>
+    <script src="chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="chart.js"></script>
+    <script src="html2canvas.min.js"></script>
+    <script src="jspdf.umd.min.js"></script>
+    <script src="moment.min.js"></script>
+    <script src="chartjs-adapter-moment.min.js"></script>
+    <script src="chartjs-plugin-annotation.min.js"></script>
         <script src="script.js"></script>
+        <script>
+            // Add the "Download Graph" button functionality
+            document.getElementById('downloadGraph').addEventListener('click', function () {
+                // Get the Chart.js instance of the pingChart canvas
+                const chartInstance = Chart.getChart('pingChart');
+
+                // Export the chart as an image
+                const imageData = chartInstance.toBase64Image();
+
+                // Create a temporary anchor element
+                const anchor = document.createElement('a');
+
+                // Get the current date and time
+                const now = new Date();
+                const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}-${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+                // Set the download filename
+                anchor.download = `graph_for_${formattedDate}.png`;
+
+                // Set the image URL to the chart image data
+                anchor.href = imageData;
+
+                // Simulate a click on the anchor element to trigger the download
+                anchor.click();
+            });
+        </script>
         </div>
     </div>
 </body>
